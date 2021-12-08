@@ -44,6 +44,8 @@ Component* Actor::addComponent(Component* component)
     //Set old component to hold the values of the new component
     m_component = appendedComponent;
     m_componentCount++;
+
+    return component;
 }
 
 bool Actor::removeComponent(Component* component)
