@@ -31,35 +31,35 @@ void Actor::onCollision(Actor* other)
 
 Component* Actor::addComponent(Component* component)
 {
-    //Create a new array with a size one greater than our old array
+    //Create a new component with a size one greater than our old array
     Component** appendedComponent = new Component* [m_componentCount + 1];
-    //Copy the values from the old array to the new array
+    //Copy the values from the old component to the new component
     for (int i = 0; i < m_componentCount; i++)
     {
         appendedComponent[i] = m_component[i];
     }
 
-    //Set the last value in the new array to be the actor we want to add
+    //Set the last value in the new component to be the component we want to add
     appendedComponent[m_componentCount] = component;
-    //Set old array to hold the values of the new array
+    //Set old component to hold the values of the new component
     m_component = appendedComponent;
     m_componentCount++;
 }
 
 bool Actor::removeComponent(Component* component)
 {
-    //Check to see if the actor was null
+    //Check to see if the component was null
     if (!component)
     {
         return false;
     }
 
     bool actorRemoved = false;
-    //Create a new array with a size one less than our old array
+    //Create a new component with a size one less than our old component
     Component** newComponent = new Component* [m_componentCount - 1];
-    //Create variable to access tempArray index
+    //Create variable to access newcomponent index
     int j = 0;
-    //Copy values from the old array to the new array
+    //Copy values from the old component to the new component
     for (int i = 0; i < m_componentCount; i++)
     {
         if (component != m_component[i])
@@ -72,7 +72,7 @@ bool Actor::removeComponent(Component* component)
             actorRemoved = true;
         }
     }
-    //Set the old array to the new array
+    //Set the old component to the new component
     if (actorRemoved)
     {
         m_component = newComponent;
@@ -84,18 +84,18 @@ bool Actor::removeComponent(Component* component)
 
 bool Actor::removeComponent(const char* componentName)
 {
-    //Check to see if the actor was null
+    //Check to see if the component Name was null
     if (!componentName)
     {
         return false;
     }
 
     bool actorRemoved = false;
-    //Create a new array with a size one less than our old array
+    //Create a new component with a size one less than our old component
     Component** newComponent = new Component * [m_componentCount - 1];
-    //Create variable to access tempArray index
+    //Create variable to access component index
     int j = 0;
-    //Copy values from the old array to the new array
+    //Copy values from the old component to the new component
     for (int i = 0; i < m_componentCount; i++)
     {
         if (componentName != m_component[i]->getName())
@@ -108,7 +108,7 @@ bool Actor::removeComponent(const char* componentName)
             actorRemoved = true;
         }
     }
-    //Set the old array to the new array
+    //Set the old component to the new component
     if (actorRemoved)
     {
         m_component = newComponent;
