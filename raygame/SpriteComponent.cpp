@@ -37,7 +37,7 @@ void SpriteComponent::draw()
 
 	//Change the position of th esprite to be in the center of the transform
 	position = position - (forward * getWidth() / 2);
-	position = position - (up * getWidth() / 2);
+	position = position - (up.getNormalized() * getWidth() / 2);
 
 	//Change the positipon vector to be a raylib vector
 	RAYLIB_H::Vector2 rayPos = { position.x, position.y };
