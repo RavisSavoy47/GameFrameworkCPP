@@ -3,6 +3,7 @@
 #include "Transform2D.h"
 #include "Actor.h"
 #include <Matrix3.h>
+#include <cmath>
 
 SpriteComponent::SpriteComponent(Texture2D* texture, const char* name) : Component::Component(name)
 {
@@ -33,4 +34,6 @@ void SpriteComponent::draw()
 	position = position - (up * getWidth() / 2);
 
 	RAYLIB_H::Vector2 rayPos = { position.x, position.y };
+
+	float rotation = atan2(getOwner()->getTransform()->getGlobalMatrix()->m10, getOwner()->getTransform()->getGlobalMatrix()->m00);
 }
