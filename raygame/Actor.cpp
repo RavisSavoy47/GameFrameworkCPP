@@ -14,7 +14,6 @@ Actor::~Actor()
     delete m_transform;
 }
 
-
 Actor::Actor(float x, float y, const char* name = "Actor")
 {
     //Initialze default values
@@ -31,18 +30,25 @@ void Actor::onCollision(Actor* other)
 
 Component* Actor::addComponent(Component* component)
 {
-    //Create a new component with a size one greater than our old array
-    Component** appendedComponent = new Component* [m_componentCount + 1];
-    //Copy the values from the old component to the new component
+    //Return null if this component has an owner already
+    Actor* owner = component->getOwner();
+    if (owner)
+        return nullptr;
+
+    component->assignOwner(this);
+
+    //Create a new array with a size one greater than our old array
+    Component** appendedArray = new Component* [m_componentCount + 1];
+    //Copy the values from the old array to the new array
     for (int i = 0; i < m_componentCount; i++)
     {
-        appendedComponent[i] = m_component[i];
+        appendedArray[i] = m_components[i];
     }
 
-    //Set the last value in the new component to be the component we want to add
-    appendedComponent[m_componentCount] = component;
-    //Set old component to hold the values of the new component
-    m_component = appendedComponent;
+    //Set the last value in the new array to be the actor we want to add
+    appendedArray[m_componentCount] = component;
+    //Set old array to hold the values of the new array
+    m_components = appendedArray;
     m_componentCount++;
 
     return component;
@@ -50,49 +56,54 @@ Component* Actor::addComponent(Component* component)
 
 bool Actor::removeComponent(Component* component)
 {
-    //Check to see if the component was null
+    //Check to see if the actor was null
     if (!component)
-    {
         return false;
-    }
 
-    bool actorRemoved = false;
-    //Create a new component with a size one less than our old component
-    Component** newComponent = new Component* [m_componentCount - 1];
+    bool componentRemoved = false;
+    //Create a new array with a size one greater than our old array
+    Component** newArray = new Component* [m_componentCount - 1];
     //Create variable to access newcomponent index
     int j = 0;
-    //Copy values from the old component to the new component
+    //Copy the values from the old array to the new array
     for (int i = 0; i < m_componentCount; i++)
     {
-        if (component != m_component[i])
+        if (component != m_components[i])
         {
-            newComponent[j] = m_component[i];
+            newArray[j] = m_components[i];
             j++;
         }
         else
         {
-            actorRemoved = true;
+            componentRemoved = true;
         }
     }
-    //Set the old component to the new component
-    if (actorRemoved)
+
+    if (componentRemoved)
     {
-        m_component = newComponent;
+        //Set the old array to the new array
+        m_components = newArray;
         m_componentCount--;
+        delete component;
     }
+    
+    delete[] newArray;
+
     //Return whether or not the removal was successful
-    return actorRemoved;
+    return componentRemoved;
 }
 
-bool Actor::removeComponent(const char* componentName)
+bool Actor::removeComponent(const char* name)
 {
     //Check to see if the component Name was null
-    if (!componentName)
+    if (!name)
     {
         return false;
     }
 
-    bool actorRemoved = false;
+    bool componentRemoved = false;
+    Component* componentToDelete = nullptr;
+
     //Create a new component with a size one less than our old component
     Component** newComponent = new Component * [m_componentCount - 1];
     //Create variable to access component index
@@ -100,35 +111,39 @@ bool Actor::removeComponent(const char* componentName)
     //Copy values from the old component to the new component
     for (int i = 0; i < m_componentCount; i++)
     {
-        if (componentName != m_component[i]->getName())
+        if (strcmp(m_components[i]->getName(), name) == 0)
         {
-            newComponent[j] = m_component[i];
+            newComponent[j] = m_components[i];
             j++;
         }
         else
         {
-            actorRemoved = true;
+            componentRemoved = true;
+            componentToDelete = m_components[i];
         }
     }
     //Set the old component to the new component
-    if (actorRemoved)
+    if (componentRemoved)
     {
-        m_component = newComponent;
+        m_components = newComponent;
         m_componentCount--;
+        delete componentToDelete;
     }
     //Return whether or not the removal was successful
-    return actorRemoved;
+    return componentRemoved;
 }
 
 Component* Actor::getComponet(const char* componentName)
 {
+    //Iterates through the component array
     for (int i = 0; i < m_componentCount; i++)
     {
-        if (componentName == m_component[i]->getName())
-        {
-            return m_component[i];
-        }
+        //Return the component if the name is the same as the current component
+        if (strcmp(m_components[i]->getName(), componentName) == 0)
+            return m_components[i];
     }
+
+    //Returns null if it cant find a match
     return nullptr;
 }
 
@@ -139,19 +154,35 @@ void Actor::start()
 
 void Actor::update(float deltaTime)
 {
+    for (int i = 0; i < m_componentCount; i++)
+    {
+        if (m_components[i]->getStarted())
+            m_components[i]->start();
+
+        m_components[i]->update(deltaTime);
+    }
 }
 
 void Actor::draw()
 {
+    for (int i = 0; i < m_componentCount; i++)
+        m_components[i]->draw();
+    
 }
 
 void Actor::end()
 {
     m_started = false;
+
+    for (int i = 0; i < m_componentCount; i++)
+        m_components[i]->end();
 }
 
 void Actor::onDestroy()
 {
+    for (int i = 0; i < m_componentCount; i++)
+        m_components[i]->onDestroy();
+
     //Removes this actor from its parent if it has one
     if (getTransform()->getParent())
         getTransform()->getParent()->removeChild(getTransform());
@@ -159,9 +190,8 @@ void Actor::onDestroy()
 
 bool Actor::checkForCollision(Actor* other)
 {
-    //Call check collision if there is a collider attached to this actor
-    if (m_collider)
-        return m_collider->checkCollision(other);
+    for (int i = 0; i < m_componentCount; i++)
+        m_components[i]->onCollision(other);
 
-    return false;
+    return other;
 }

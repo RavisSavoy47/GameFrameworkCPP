@@ -1,31 +1,14 @@
 #include "MoveComponent.h"
-#include <Vector2.h>
-#include "raylib.h"
 #include "Actor.h"
-
-MoveComponent::MoveComponent()
-{
-
-}
-
-MoveComponent::MoveComponent(Actor* owner, const char* name, float speed) 
-	:Component::Component(owner = owner, name = name)
-
-{
-	m_speed = speed;
-}
-
-MoveComponent::~MoveComponent()
-{
-}
+#include"Transform2D.h"
 
 void MoveComponent::update(float deltaTime)
 {
-	m_velocity = m_moveDirection.getNormalized() * m_speed * deltaTime;
+	//Add the new velocity to the old position to get the new position
+	MathLibrary::Vector2 newPosition = getOwner()->getTransform()->getLocalPosition() + getVelocity() * deltaTime;
 
-	m_position = getOwner()->getTransform()->getLocalPosition();
-
-	m_position = m_position + m_velocity;
+	//Set the actors position to be the new position found
+	getOwner()->getTransform()->setLocalPosition(newPosition);
 }
 
 
