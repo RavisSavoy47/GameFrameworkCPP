@@ -5,7 +5,6 @@ class Component
 {
 public:
 	Component();
-	Component(const char* name);
 	virtual ~Component();
 
 	/// <summary>
@@ -18,11 +17,6 @@ public:
 	/// </summary>
 	/// <param name="owner">The new owner of this component</param>
 	void assignOwner(Actor* owner);
-
-	/// <summary>
-	/// Gets the actor that this component is attached to
-	/// </summary>
-	const char* getName() { return m_name; } 
 
 	/// <summary>
 	/// Gets whether or not or not the start function for this component instance has been called
@@ -44,6 +38,5 @@ public:
 private:
 	bool m_started;
 	Actor* m_owner;
-	const char* m_name;
 };
 

@@ -22,8 +22,6 @@ Actor::Actor(float x, float y, const char* name = "Actor")
     m_name = name;
 }
 
-
-
 void Actor::onCollision(Actor* other)
 {
 }
@@ -98,60 +96,6 @@ bool Actor::removeComponent(Component* component)
 
     //Return whether or not the removal was successful
     return componentRemoved;
-}
-
-bool Actor::removeComponent(const char* name)
-{
-    //Check to see if the component Name was null
-    if (!name)
-    {
-        return false;
-    }
-
-    bool componentRemoved = false;
-    Component* componentToDelete = nullptr;
-
-    //Create a new component with a size one less than our old component
-    Component** newComponent = new Component * [m_componentCount - 1];
-    //Create variable to access component index
-    int j = 0;
-    //Copy values from the old component to the new component
-    for (int i = 0; i < m_componentCount; i++)
-    {
-        if (strcmp(m_components[i]->getName(), name) == 0)
-        {
-            newComponent[j] = m_components[i];
-            j++;
-        }
-        else
-        {
-            componentRemoved = true;
-            componentToDelete = m_components[i];
-        }
-    }
-    //Set the old component to the new component
-    if (componentRemoved)
-    {
-        m_components = newComponent;
-        m_componentCount--;
-        delete componentToDelete;
-    }
-    //Return whether or not the removal was successful
-    return componentRemoved;
-}
-
-Component* Actor::getComponet(const char* componentName)
-{
-    //Iterates through the component array
-    for (int i = 0; i < m_componentCount; i++)
-    {
-        //Return the component if the name is the same as the current component
-        if (strcmp(m_components[i]->getName(), componentName) == 0)
-            return m_components[i];
-    }
-
-    //Returns null if it cant find a match
-    return nullptr;
 }
 
 void Actor::start()
