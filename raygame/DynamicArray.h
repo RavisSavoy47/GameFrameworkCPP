@@ -52,7 +52,7 @@ public:
     bool contains(T actor);
 
     T operator[](int index);
-    
+
 
 private:
     T* m_item;
